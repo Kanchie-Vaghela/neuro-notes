@@ -31,6 +31,7 @@ app.get('/notes', (req, res) => {
   res.json(notes)
 })
 
+//transform note content into study chunks for ADHD mode
 app.post('/transform/chunk', (req, res) => {
   const { content } = req.body;
 
@@ -51,6 +52,24 @@ app.post('/transform/chunk', (req, res) => {
   res.json({
     mode: 'adhd',
     chunks
+  });
+});
+
+//transform note content for dyslexia-friendly reading
+app.post('/transform/read', (req, res) => {
+  const { content } = req.body;
+
+  if (!content || content.trim() === '') {
+    return res.status(400).json({
+      error: 'Content is required for read mode'
+    });
+  }
+
+  const rewritten = `Here is a simplified version of your notes:\n${content}`;
+
+  res.json({
+    mode: 'dyslexia',
+    text: rewritten
   });
 });
 
