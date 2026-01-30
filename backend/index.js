@@ -76,6 +76,45 @@ app.post('/transform/read', (req, res) => {
   });
 });
 
+//summarize note content
+app.post('/transform/summarize', (req, res) => {
+  const { content } = req.body;
+
+  if (!content || content.trim() === '') {
+    return res.status(400).json({
+      error: 'Content is required for summary'
+    });
+  }
+
+  const summary = `Summary:\n\n${content.slice(0, 150)}...`;
+
+  res.json({
+    mode: 'summary',
+    text: summary
+  });
+});
+
+//generate flashcards from note content
+app.post('/transform/flashcards', (req, res) => {
+  const { content } = req.body;
+
+  if (!content || content.trim() === '') {
+    return res.status(400).json({
+      error: 'Content is required for flashcards'
+    });
+  }
+
+  const flashcards = [
+    { question: 'What is the main topic?', answer: content.slice(0, 50) + '...' },
+    { question: 'List one key concept.', answer: 'Key concept example' },
+    { question: 'Why is this topic important?', answer: 'Because it affects system performance.' }
+  ];
+
+  res.json({
+    mode: 'flashcards',
+    cards: flashcards
+  });
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)
