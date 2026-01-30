@@ -4,6 +4,7 @@ function App() {
   const [notes, setNotes] = useState("");
   const [chunks, setChunks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [readText, setReadText] = useState("");
 
   const generatePlan = async () => {
     if (!notes.trim()) return;
@@ -29,6 +30,31 @@ function App() {
     setLoading(false);
   };
 
+  const readMode = async () => {
+    if (!notes.trim()) return;
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("http://localhost:3000/transform/read", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: notes }),
+      });
+
+      const data = await res.json();
+      setReadText(data.text || "");
+      setChunks([]);
+    } catch (err) {
+      console.error(err);
+      alert("Backend not reachable");
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div style={{ padding: 40 }}>
       <h1>Neuro Notes</h1>
@@ -44,6 +70,12 @@ function App() {
       <button onClick={generatePlan}>
         {loading ? "Generating..." : "Generate Study Plan"}
       </button>
+      <button onClick={readMode} style={{ marginLeft: 10 }}>
+        Read Mode
+      </button>
+      {readText && (
+        <div style={{ marginTop: 30, whiteSpace: "pre-wrap" }}>{readText}</div>
+      )}
 
       <div style={{ marginTop: 30 }}>
         {chunks.map((c, i) => (
