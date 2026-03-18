@@ -1,120 +1,20 @@
 import express from 'express'
-import cors from 'cors';
+import cors from 'cors'
+import dotenv from 'dotenv'
+import { connectDB } from './config/db.js'
+import authRoutes from "./routes/auth.routes.js"
 
+dotenv.config()
 
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000
 
-app.use(cors());
-app.use(express.json()) // ← mandatory, no excuses
+app.use(cors())
+app.use(express.json())
 
-const notes = [] // ← in-memory storage
+connectDB()
 
-
-//accept a new note
-app.post('/notes', (req, res) => {
-  const { content } = req.body
-
-  if (!content || content.trim() === '') {
-    return res.status(400).json({ error: 'Note content is required' })
-  }
-
-  const note = {
-    id: Date.now().toString(),
-    content,
-    createdAt: new Date().toISOString()
-  }
-
-  notes.push(note)
-  res.status(201).json(note)
-})
-
-//retrieve all notes
-app.get('/notes', (req, res) => {
-  res.json(notes)
-})
-
-//transform note content into study chunks for ADHD mode
-app.post('/transform/chunk', (req, res) => {
-  const { content } = req.body;
-
-  if (!content || content.trim() === '') {
-    return res.status(400).json({
-      error: 'Content is required to generate study chunks'
-    });
-  }
-
-  const chunks = [
-    { task: 'Read the notes once without stopping', duration: '15 min' },
-    { task: 'Write down key terms and definitions', duration: '10 min' },
-    { task: 'Answer 3 self-check questions', duration: '10 min' },
-    { task: 'Take a short break', duration: '5 min' },
-    { task: 'Review confusing sections', duration: '15 min' }
-  ];
-
-  res.json({
-    mode: 'adhd',
-    chunks
-  });
-});
-
-//transform note content for dyslexia-friendly reading
-app.post('/transform/read', (req, res) => {
-  const { content } = req.body;
-
-  if (!content || content.trim() === '') {
-    return res.status(400).json({
-      error: 'Content is required for read mode'
-    });
-  }
-
-  const rewritten = `Here is a simplified version of your notes:\n${content}`;
-
-  res.json({
-    mode: 'dyslexia',
-    text: rewritten
-  });
-});
-
-//summarize note content
-app.post('/transform/summarize', (req, res) => {
-  const { content } = req.body;
-
-  if (!content || content.trim() === '') {
-    return res.status(400).json({
-      error: 'Content is required for summary'
-    });
-  }
-
-  const summary = `Summary:\n\n${content.slice(0, 150)}...`;
-
-  res.json({
-    mode: 'summary',
-    text: summary
-  });
-});
-
-//generate flashcards from note content
-app.post('/transform/flashcards', (req, res) => {
-  const { content } = req.body;
-
-  if (!content || content.trim() === '') {
-    return res.status(400).json({
-      error: 'Content is required for flashcards'
-    });
-  }
-
-  const flashcards = [
-    { question: 'What is the main topic?', answer: content.slice(0, 50) + '...' },
-    { question: 'List one key concept.', answer: 'Key concept example' },
-    { question: 'Why is this topic important?', answer: 'Because it affects system performance.' }
-  ];
-
-  res.json({
-    mode: 'flashcards',
-    cards: flashcards
-  });
-});
+app.use("/auth", authRoutes)
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)

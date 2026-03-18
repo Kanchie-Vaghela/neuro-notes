@@ -142,7 +142,7 @@ function App() {
             </div>
           ))}
         </div>
-      )}
+      )}  
 
       {readText && (
         <div style={{ marginTop: 30, whiteSpace: "pre-wrap" }}>{readText}</div>
