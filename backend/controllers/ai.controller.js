@@ -1,34 +1,32 @@
-import Session from "../models/session.model.js"
+import Session from "../models/session.model.js";
 
 export const generateContent = async (req, res) => {
   try {
-    const { mode, content } = req.body
+    const { mode, content } = req.body;
 
     if (!mode || !content) {
-      return res.status(400).json({ message: "Mode and content required" })
+      return res.status(400).json({ message: "Mode and content required" });
     }
 
-    let result
+    let result;
 
     // MOCK AI OUTPUT FOR NOW
     if (mode === "summary") {
-      result = `Summary: ${content.slice(0,100)}...`
+      result = `Summary: ${content.slice(0, 100)}...`;
+      console.log(result);
     }
 
     if (mode === "flashcards") {
-      result = [
-        { question: "Main topic?", answer: content.slice(0,50) }
-      ]
+      result = [{ question: "Main topic?", answer: content.slice(0, 50) }];
+      console.log(result);
     }
 
     if (mode === "mindmap") {
       result = {
         title: "Root",
-        children: [
-          { title: "Key Idea 1" },
-          { title: "Key Idea 2" }
-        ]
-      }
+        children: [{ title: "Key Idea 1" }, { title: "Key Idea 2" }],
+      };
+      console.log(result);
     }
 
     if (mode === "quiz") {
@@ -36,26 +34,25 @@ export const generateContent = async (req, res) => {
         {
           question: "Example question?",
           options: ["A", "B", "C", "D"],
-          answer: "A"
-        }
-      ]
+          answer: "A",
+        },
+      ];
     }
 
     const session = new Session({
       userId: req.user,
       mode,
       inputNotes: content,
-      output: result
-    })
+      output: result,
+    });
 
-    await session.save()
+    await session.save();
 
     res.json({
       mode,
-      result
-    })
-
+      result,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server error" })
+    res.status(500).json({ message: "Server error" });
   }
-}
+};
