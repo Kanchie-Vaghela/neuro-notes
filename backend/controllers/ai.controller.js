@@ -1,44 +1,33 @@
 import Session from "../models/session.model.js";
+import { generateAI, safeParse } from "../services/ai.service.js";
 
 export const generateContent = async (req, res) => {
   try {
     const { mode, content } = req.body;
 
     if (!mode || !content) {
-      return res.status(400).json({ message: "Mode and content required" });
+      return res.status(400).json({
+        success: false,
+        message: "Mode and content required",
+      });
     }
 
-    let result;
+    // 🔥 CALL AI
+    const raw = await generateAI(mode, content);
 
-    // MOCK AI OUTPUT FOR NOW
-    if (mode === "summary") {
-      result = `Summary: ${content.slice(0, 100)}...`;
-      console.log(result);
+    let result = safeParse(raw);
+
+    // ⚠️ fallback
+    if (!result) {
+      result = ["Failed to parse AI response"];
     }
 
-    if (mode === "flashcards") {
-      result = [{ question: "Main topic?", answer: content.slice(0, 50) }];
-      console.log(result);
+    // ⚠️ always array
+    if (!Array.isArray(result)) {
+      result = [result];
     }
 
-    if (mode === "mindmap") {
-      result = {
-        title: "Root",
-        children: [{ title: "Key Idea 1" }, { title: "Key Idea 2" }],
-      };
-      console.log(result);
-    }
-
-    if (mode === "quiz") {
-      result = [
-        {
-          question: "Example question?",
-          options: ["A", "B", "C", "D"],
-          answer: "A",
-        },
-      ];
-    }
-
+    // ✅ save session
     const session = new Session({
       userId: req.user,
       mode,
@@ -49,10 +38,16 @@ export const generateContent = async (req, res) => {
     await session.save();
 
     res.json({
+      success: true,
       mode,
       result,
     });
+
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
