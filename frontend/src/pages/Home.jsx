@@ -1,126 +1,57 @@
-import { useState, useEffect } from "react"
-import { apiRequest } from "../utils/api"
+import { useState, useEffect } from "react";
+import { apiRequest } from "../utils/api";
+import FlashcardView from "../components/modes/FlashcardView";
+import SummaryView from "../components/modes/SummaryView";
+import MindmapView from "../components/modes/MindmapView";
+import QuizView from "../components/modes/QuizView";
 
 export default function Home({ token }) {
-  const [notes, setNotes] = useState("")
-  const [mode, setMode] = useState("summary")
-  const [result, setResult] = useState(null)
-  const [sessions, setSessions] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [notes, setNotes] = useState("");
+  const [mode, setMode] = useState("summary");
+  const [result, setResult] = useState(null);
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // ✅ Generate
   const generate = async () => {
-    if (!notes.trim()) return
+    if (!notes.trim()) return;
 
     try {
-      setLoading(true)
+      setLoading(true);
 
       const data = await apiRequest(
         "/ai/generate",
         "POST",
         { mode, content: notes },
-        token
-      )
+        token,
+      );
 
-      setResult(data.result)
+      setResult(data.result);
 
-      fetchSessions() // refresh history
-
+      fetchSessions(); // refresh history
     } catch (err) {
-      console.error(err)
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // ✅ Fetch history
   const fetchSessions = async () => {
     try {
-      const data = await apiRequest("/sessions", "GET", null, token)
-      setSessions(data)
+      const data = await apiRequest("/sessions", "GET", null, token);
+      setSessions(data);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }
+  };
 
   useEffect(() => {
-    if (token) fetchSessions()
-  }, [token])
-
-  // ✅ Render output properly
-  const renderOutput = () => {
-    if (!result) return null
-
-    if (!Array.isArray(result)) {
-    return (
-      <p className="text-gray-700">
-        {typeof result === "string"
-          ? result
-          : JSON.stringify(result, null, 2)}
-      </p>
-    );
-  }
-
-    if (mode === "summary") {
-  return (
-    <ul className="list-disc pl-5 space-y-2 text-gray-700">
-      {result.map((point, i) => (
-        <li key={i}>{point}</li>
-      ))}
-    </ul>
-  );
-}
-
-    if (mode === "flashcards") {
-  return (
-    <div className="grid grid-cols-2 gap-4">
-      {result.map((card, i) => (
-        <div key={i} className="bg-white p-4 rounded-xl border shadow-sm">
-          <p className="font-medium text-gray-800">
-            {card.q || "No question"}
-          </p>
-          <p className="text-gray-500 mt-2 text-sm">
-            {card.a || "No answer"}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-    if (mode === "quiz") {
-  return (
-    <div className="space-y-4">
-      {result.map((q, i) => (
-        <div key={i} className="bg-white p-4 rounded-xl border shadow-sm">
-          <p className="font-medium text-gray-800">
-            {q.question || "No question"}
-          </p>
-
-          <div className="mt-2 space-y-1">
-            {(q.options || []).map((opt, j) => (
-              <div key={j} className="px-3 py-2 bg-gray-100 rounded-lg">
-                {opt}
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-    // fallback
-    return (
-      <pre className="text-sm text-gray-700 whitespace-pre-wrap">
-        {JSON.stringify(result, null, 2)}
-      </pre>
-    )
-  }
+    if (token) fetchSessions();
+  }, [token]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex">
-
       {/* LEFT: History */}
       <div className="w-1/3 p-4">
         <div className="bg-white/70 backdrop-blur-md rounded-2xl p-4 h-full shadow-sm border border-gray-200 overflow-y-auto">
@@ -135,15 +66,13 @@ export default function Home({ token }) {
               <div
                 key={s._id}
                 onClick={() => {
-                  setMode(s.mode)
-                  setResult(s.output) // ✅ important fix
+                  setMode(s.mode);
+                  setResult(s.output); // ✅ important fix
                 }}
                 className="p-3 rounded-xl cursor-pointer hover:bg-gray-100 transition"
               >
                 <p className="text-xs text-indigo-500 uppercase">{s.mode}</p>
-                <p className="text-sm text-gray-600 truncate">
-                  {s.inputNotes}
-                </p>
+                <p className="text-sm text-gray-600 truncate">{s.inputNotes}</p>
               </div>
             ))}
           </div>
@@ -152,14 +81,12 @@ export default function Home({ token }) {
 
       {/* RIGHT: Main */}
       <div className="w-2/3 p-6 flex flex-col">
-
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Neuro Study ✨
         </h1>
 
         {/* Output */}
         <div className="flex-1 bg-white/70 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-gray-200 overflow-y-auto mb-4">
-
           {!result && (
             <p className="text-gray-400 text-center mt-10">
               Your AI-generated content will appear here...
@@ -167,18 +94,17 @@ export default function Home({ token }) {
           )}
 
           {result && (
-            <div className="bg-indigo-50 p-4 rounded-xl">
-              <p className="text-xs text-indigo-400 mb-2 uppercase">
-                {mode}
-              </p>
-              {renderOutput()}
-            </div>
+            <>
+              {mode === "summary" && <SummaryView data={result} />}
+              {mode === "flashcards" && <FlashcardView data={result} />}
+              {mode === "quiz" && <QuizView data={result} />}
+              {mode === "mindmap" && <MindmapView data={result} />}
+            </>
           )}
         </div>
 
         {/* Input */}
         <div className="bg-white/80 backdrop-blur-md rounded-2xl p-3 flex items-center gap-3 shadow-sm border border-gray-200">
-
           <select
             value={mode}
             onChange={(e) => setMode(e.target.value)}
@@ -207,5 +133,5 @@ export default function Home({ token }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

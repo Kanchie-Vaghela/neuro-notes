@@ -12,22 +12,22 @@ export const generateContent = async (req, res) => {
       });
     }
 
-    // 🔥 CALL AI
+    // CALL AI
     const raw = await generateAI(mode, content);
 
     let result = safeParse(raw);
 
-    // ⚠️ fallback
+    // fallback
     if (!result) {
       result = ["Failed to parse AI response"];
     }
 
-    // ⚠️ always array
+    // always array
     if (!Array.isArray(result)) {
       result = [result];
     }
 
-    // ✅ save session
+    // save session
     const session = new Session({
       userId: req.user,
       mode,
