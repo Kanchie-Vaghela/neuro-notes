@@ -5,14 +5,14 @@ import SummaryView from "../components/modes/SummaryView";
 import MindmapView from "../components/modes/MindmapView";
 import QuizView from "../components/modes/QuizView";
 
-export default function Home({ token }) {
+export default function Home({ token, logout }) {
   const [notes, setNotes] = useState("");
   const [mode, setMode] = useState("summary");
   const [result, setResult] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Generate
+  //  Generate
   const generate = async () => {
     if (!notes.trim()) return;
 
@@ -36,7 +36,7 @@ export default function Home({ token }) {
     }
   };
 
-  // ✅ Fetch history
+  //  Fetch history
   const fetchSessions = async () => {
     try {
       const data = await apiRequest("/sessions", "GET", null, token);
@@ -81,8 +81,14 @@ export default function Home({ token }) {
 
       {/* RIGHT: Main */}
       <div className="w-2/3 p-6 flex flex-col">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
           Neuro Study ✨
+          <button
+            onClick={logout}
+            className="bg-red-400 px-3 py-0.5 rounded text-white text-sm hover:bg-red-500 transition"
+          >
+            Logout
+          </button>
         </h1>
 
         {/* Output */}
