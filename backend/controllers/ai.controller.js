@@ -2,32 +2,28 @@ import Session from "../models/session.model.js";
 import { generateAI, safeParse } from "../services/ai.service.js";
 
 export const generateContent = async (req, res) => {
+  const { mode, content } = req.body;
+
+  console.log("[AI CONTROLLER] request received", { mode, contentLength: content?.length });
+
+  if (!mode || !content) {
+    return res.status(400).json({
+      success: false,
+      message: "Mode and content are required",
+    });
+  }
+
   try {
-    const { mode, content } = req.body;
-
-    if (!mode || !content) {
-      return res.status(400).json({
-        success: false,
-        message: "Mode and content required",
-      });
-    }
-
-    // CALL AI
+    console.log("[AI CONTROLLER] calling generateAI", { mode });
     const raw = await generateAI(mode, content);
+    console.log("[AI CONTROLLER] raw AI response", { raw });
 
     let result = safeParse(raw);
 
-    // fallback
-    if (!result) {
-      result = ["Failed to parse AI response"];
+    if (result === null || result === undefined) {
+      result = raw;
     }
 
-    // always array
-    if (!Array.isArray(result)) {
-      result = [result];
-    }
-
-    // save session
     const session = new Session({
       userId: req.user,
       mode,
@@ -37,17 +33,20 @@ export const generateContent = async (req, res) => {
 
     await session.save();
 
-    res.json({
+    return res.json({
       success: true,
       mode,
       result,
     });
-
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
+    const errorMessage =
+      error?.response?.data || error?.message || "Unknown AI error";
+
+    console.error("[AI CONTROLLER] error", errorMessage);
+
+    return res.status(500).json({
       success: false,
-      message: "Server error",
+      message: typeof errorMessage === "string" ? errorMessage : JSON.stringify(errorMessage),
     });
   }
 };
