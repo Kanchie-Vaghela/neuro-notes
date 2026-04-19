@@ -1,20 +1,25 @@
-import { Routes, Route, Navigate } from "react-router-dom"
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom"
 import { useState } from "react"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Home from "./pages/Home"
+import ErrorPage from "./error/Error"
 
 function App() {
-  const [token, setToken] = useState(() => localStorage.getItem("token"))
+  const navigate = useNavigate()
+  const [token, setToken] = useState(() => sessionStorage.getItem("token"))
 
   const handleSetToken = (newToken) => {
-    localStorage.setItem("token", newToken)
+    if (newToken) {
+      sessionStorage.setItem("token", newToken)
+    }
     setToken(newToken)
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("token")
+    sessionStorage.removeItem("token")
     setToken(null)
+    navigate("/login")
   }
 
   return (
@@ -42,6 +47,8 @@ function App() {
           )
         }
       />
+
+      <Route path="/error" element={<ErrorPage />} />
 
       {/* Default redirect */}
       <Route

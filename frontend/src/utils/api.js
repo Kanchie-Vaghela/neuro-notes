@@ -10,5 +10,14 @@ export const apiRequest = async (endpoint, method, body, token) => {
     body: body ? JSON.stringify(body) : undefined
   })
 
-  return res.json()
+  const data = await res.json().catch(() => ({}))
+
+  if (!res.ok) {
+    const error = new Error(data.message || "Request failed")
+    error.status = res.status
+    error.data = data
+    throw error
+  }
+
+  return data
 }

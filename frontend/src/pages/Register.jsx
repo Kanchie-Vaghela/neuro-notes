@@ -32,7 +32,6 @@ const Register = ({ setToken }) => {
         })
 
         if (loginData.token) {
-          localStorage.setItem("token", loginData.token)
           setToken(loginData.token)
 
           // ✅ redirect

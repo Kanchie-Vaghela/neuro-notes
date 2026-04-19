@@ -40,9 +40,18 @@ export default function Home({ token, logout }) {
   const fetchSessions = async () => {
     try {
       const data = await apiRequest("/sessions", "GET", null, token);
-      setSessions(data);
+      if (Array.isArray(data)) {
+        setSessions(data);
+      } else {
+        console.error("Unexpected sessions response:", data);
+        setSessions([]);
+      }
     } catch (err) {
       console.error(err);
+      if (err.status === 401) {
+        logout();
+      }
+      setSessions([]);
     }
   };
 

@@ -24,7 +24,6 @@ const Login = ({ setToken }) => {
       })
 
       if (data.token) {
-        localStorage.setItem("token", data.token)
         setToken(data.token)
 
         // 🔥 redirect after login
