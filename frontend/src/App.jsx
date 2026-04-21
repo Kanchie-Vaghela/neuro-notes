@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom"
 import { useState } from "react"
+import TitleManager from "./components/modes/TitleManager"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Home from "./pages/Home"
@@ -23,7 +24,9 @@ function App() {
   }
 
   return (
-    <Routes>
+    <>
+      <TitleManager />
+      <Routes>
 
       {/* Public routes */}
       <Route
@@ -57,6 +60,7 @@ function App() {
       />
 
     </Routes>
+    </>
   )
 }
 
