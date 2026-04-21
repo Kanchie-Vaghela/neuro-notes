@@ -6,7 +6,32 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const buildPrompt = (mode, content) => {
   switch (mode) {
     case "summary":
-      return `Return ONLY valid JSON. Do NOT add explanation.\n\nFormat:\n[\"point1\", \"point2\"]\n\nText:\n${content}`;
+      return `Return ONLY valid JSON. Do NOT add explanation.
+
+Format:
+[
+  "point 1",
+  "point 2",
+  "point 3"
+]
+
+Rules:
+- If the text is short → return 3–4 bullet points
+- If the text is medium → return 4–6 bullet points
+- If the text is long → return 6–10 bullet points
+- Each point must be 1–2 lines (not just keywords)
+- Avoid vague or single-word points
+- Keep it concise but meaningful
+
+Bad example:
+["AI systems", "mechanical devices"]
+
+Good example:
+["Early machines relied on manual or mechanical processes requiring human effort.",
+ "Modern systems use AI to automate tasks and improve efficiency."]
+
+Text:
+${content}`;
     case "flashcards":
       return `Return ONLY valid JSON. Do NOT add explanation.\n\nGenerate 5 flashcards.\n\nFormat:\n[\n  { \"q\": \"...\", \"a\": \"...\" }\n]\n\nText:\n${content}`;
     case "quiz":
@@ -21,7 +46,10 @@ const buildPrompt = (mode, content) => {
 export const generateAI = async (mode, content) => {
   const prompt = buildPrompt(mode, content);
 
-  console.log("[AI SERVICE] calling OpenRouter", { mode, promptLength: prompt.length });
+  console.log("[AI SERVICE] calling OpenRouter", {
+    mode,
+    promptLength: prompt.length,
+  });
 
   const response = await axios.post(
     OPENROUTER_URL,
@@ -36,7 +64,7 @@ export const generateAI = async (mode, content) => {
         "Content-Type": "application/json",
       },
       timeout: 30000,
-    }
+    },
   );
 
   const rawText = response.data?.choices?.[0]?.message?.content;
@@ -64,4 +92,4 @@ export const safeParse = (text) => {
     }
     return null;
   }
-};  
+};

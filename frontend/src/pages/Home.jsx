@@ -195,7 +195,7 @@ export default function Home({ token, logout }) {
                 />
               </svg>
             </button>
-            <h1 className="text-2xl font-bold text-gray-800">Neuro Study ✨</h1>
+            <h1 className="text-2xl font-bold text-gray-800">Study AI</h1>
           </div>
 
           {/* RIGHT: Actions */}
@@ -205,14 +205,7 @@ export default function Home({ token, logout }) {
                 Session Active
               </span>
             )}
-            {currentSessionId && (
-              <button
-                onClick={startNewChat}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg text-sm transition font-medium"
-              >
-                New Chat
-              </button>
-            )}
+            
             <button
               onClick={logout}
               className="bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-sm transition font-medium"
@@ -278,7 +271,7 @@ export default function Home({ token, logout }) {
                 ))}
               </div>
 
-              <div className="border-t border-gray-200 pt-3 mt-3 px-4">
+              <div className="border-t border-gray-100 pt-3 pb-2 mt-3 px-4">
                 <button
                   onClick={startNewChat}
                   className="w-full bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-sm py-3 rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md transform hover:scale-[1.02]"

@@ -26,7 +26,7 @@ const Login = ({ setToken }) => {
       if (data.token) {
         setToken(data.token)
 
-        // 🔥 redirect after login
+        //  redirect after login
         navigate("/home")
       } else {
         alert("Invalid credentials")
