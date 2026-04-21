@@ -3,27 +3,41 @@ import ReactFlow, { Background, Controls } from "reactflow";
 import "reactflow/dist/style.css";
 
 const MindmapView = ({ data }) => {
+  // 🧹 Step 1: Ensure data is real JSON
+  const parsedData = useMemo(() => {
+    try {
+      if (typeof data === "string") {
+        return JSON.parse(data);
+      }
+      return data;
+    } catch (err) {
+      console.error("Invalid JSON:", err);
+      return [];
+    }
+  }, [data]);
 
-  // 🔥 Convert tree → nodes + edges
+  // 🔥 Step 2: Convert tree → nodes + edges (fixed layout)
   const { nodes, edges } = useMemo(() => {
     let nodes = [];
     let edges = [];
+    let yOffset = 0; // global vertical tracker
 
-    const traverse = (node, parentId = null, level = 0, index = 0) => {
-      const id = `${node.title}-${level}-${index}`;
+    const traverse = (node, parentId = null, level = 0) => {
+      const id = `${node.title}-${yOffset}`;
 
       nodes.push({
         id,
         data: { label: node.title },
         position: {
           x: level * 250,
-          y: index * 120,
+          y: yOffset * 100,
         },
         style: {
           padding: 10,
           borderRadius: 10,
           border: "1px solid #ddd",
           background: "#ffffff",
+          fontSize: "12px",
         },
       });
 
@@ -35,20 +49,23 @@ const MindmapView = ({ data }) => {
         });
       }
 
-      node.children?.forEach((child, i) => {
-        traverse(child, id, level + 1, i);
+      yOffset++;
+
+      node.children?.forEach((child) => {
+        traverse(child, id, level + 1);
       });
     };
 
-    data.forEach((root, i) => {
-      traverse(root, null, 0, i);
+    parsedData?.forEach((root) => {
+      traverse(root);
     });
 
     return { nodes, edges };
-  }, [data]);
+  }, [parsedData]);
 
+  // 🧱 Step 3: Render (proper container sizing)
   return (
-    <div className="h-[500px] bg-white rounded-2xl border shadow-sm">
+    <div style={{ width: "100vw", height: "100vh" }}>
       <ReactFlow nodes={nodes} edges={edges} fitView>
         <Background />
         <Controls />
