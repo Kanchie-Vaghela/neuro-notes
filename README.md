@@ -1,43 +1,49 @@
-# 🧠 Neuro Study
+#  AI Study Companion
 
-An AI-powered neuro-inclusive study companion designed to transform raw study notes into personalized learning formats.
+An AI-powered full-stack study assistant that transforms raw notes into structured learning materials — summaries, flashcards, quizzes, and mindmaps — so you spend less time prepping and more time actually learning.
 
-Built with a focus on accessibility and active learning, Neuro Study helps students generate summaries, flashcards, quizzes, and visual mind maps while maintaining a persistent study history for each user.
 
-## ✨ Features
 
-* 🔐 JWT Authentication (Register/Login)
-* 📄 AI-Powered Summaries
-* 🃏 Flashcard Generation
-* 🧠 Mindmap Tree Generation
-* ❓ MCQ Quiz Generation
-* 🕘 Persistent Study History
-* 👁️ Dyslexia-Friendly Mode (UI-focused accessibility)
-* 🎨 Gemini-inspired modern UI
-* ⚡ Full-stack MERN architecture
+##  Features
 
-## 🛠️ Tech Stack
+- **Smart Summarization** — Paste raw notes and get concise, structured summaries instantly
+- **Flashcard Generator** — Auto-generates question/answer flashcard decks with interactive flip animations
+- **Quiz Mode** — Dynamic quizzes with real-time feedback and score tracking
+- **Mindmap Visualization** — Graph-based visual representation of key concepts and their relationships
+- **Session History** — Personalized learning history saved per user across sessions
+- **JWT Authentication** — Secure login, protected routes, and persistent sessions
 
-### Frontend
 
-* React
-* Tailwind CSS
-* Fetch API
+## 🛠 Tech Stack
 
-### Backend
+| Layer | Technology |
+|---|---|
+| Frontend | React, Tailwind CSS |
+| Backend | Node.js, Express |
+| Database | MongoDB |
+| AI | OpenRouter API (prompt-engineered pipelines) |
+| Auth | JWT (JSON Web Tokens) |
 
-* Node.js
-* Express.js
-* MongoDB
-* JWT Authentication
-* Mongoose
 
-## 🚀 Project Vision
+## 🤖 AI Pipeline
 
-Most AI study tools are generic. Neuro Study focuses on neuro-inclusive learning experiences by adapting content into multiple learning styles instead of simply summarizing text.
+Notes are sent to the backend where a structured prompt is constructed based on the selected learning mode. The OpenRouter API returns consistent **JSON responses** for each mode:
 
-The goal is to create a smarter and more accessible way for students to study, revise, and retain information.
+| Mode | Output Format |
+|---|---|
+| Summary | `{ title, summary, keyPoints[] }` |
+| Flashcards | `{ cards: [{ question, answer }] }` |
+| Quiz | `{ questions: [{ question, options[], correct }] }` |
+| Mindmap | `{ nodes: [], edges: [] }` |
 
----
+Prompt engineering ensures the model always returns valid, parseable JSON regardless of input length or complexity.
 
-Honestly, this project already has stronger product thinking than 90% of “AI wrapper” projects on GitHub. Most people just glue ChatGPT onto a textarea and call it innovation. Civilization continues its slow theatrical collapse.
+
+## 🔐 Authentication Flow
+
+1. User registers → password hashed → stored in MongoDB
+2. User logs in → JWT issued (expiry configurable)
+3. Token stored client-side → sent via `Authorization: Bearer` header
+4. Protected routes validate token via Express middleware
+5. All study sessions are linked to the authenticated user
+
